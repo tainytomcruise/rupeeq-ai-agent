@@ -1,0 +1,36 @@
+# RupeeQ AI Calling Agent - Production Requirements
+# Core Flask and Web Framework
+Flask==2.3.3
+Flask-SocketIO==5.3.6
+python-socketio==5.9.0
+eventlet==0.33.3
+
+# Speech Processing
+SpeechRecognition==3.10.0
+pyttsx3==2.90
+
+# Data Processing
+python-dateutil==2.8.2
+pytz==2023.3
+requests==2.31.0
+
+# Utilities
+Werkzeug==2.3.7
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+itsdangerous==2.1.2
+click==8.1.7
+blinker==1.6.2
+
+# WebSocket Support
+python-engineio==4.7.1
+
+# JSON and Data Handling
+simplejson==3.19.1
+
+# Threading and Async
+greenlet==2.0.2
+dnspython==2.4.2
+
+# Production server
+gunicorn==21.2.0

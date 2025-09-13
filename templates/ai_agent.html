@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RupeeQ AI Calling Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            background-color: white;
+        }
+        .agent-message {
+            background-color: #e9ecef;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            max-width: 80%;
+            align-self: flex-start;
+        }
+        .user-message {
+            background-color: #007bff;
+            color: white;
+            border-radius: 1rem;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            max-width: 80%;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        .controls {
+            margin-top: 1rem;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #28a745;
+        }
+        .status-inactive {
+            background-color: #dc3545;
+        }
+        .call-info {
+            background-color: #f1f1f1;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="mb-4">RupeeQ AI Calling Assistant</h1>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Call Simulation</h5>
+                        <div>
+                            <span class="status-indicator" id="callStatus"></span>
+                            <span id="callStatusText">Inactive</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="call-info" id="callInfo">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Customer:</strong> <span id="customerName">Not set</span></p>
+                                    <p><strong>Agent:</strong> <span id="agentName">RupeeQ AI</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>Call Duration:</strong> <span id="callDuration">00:00</span></p>
+                                    <p><strong>Call State:</strong> <span id="callState">Not started</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-container d-flex flex-column" id="chatContainer">
+                            <!-- Chat messages will appear here -->
+                        </div>
+                        
+                        <div class="controls">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" id="userInput" placeholder="Type your response...">
+                                <button class="btn btn-primary" id="sendBtn">Send</button>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <button class="btn btn-success" id="startCallBtn">Start Call</button>
+                                    <button class="btn btn-danger" id="endCallBtn" disabled>End Call</button>
+                                </div>
+                                <div>
+                                    <button class="btn btn-outline-primary" id="startListeningBtn">
+                                        <i class="bi bi-mic"></i> Start Listening
+                                    </button>
+                                    <button class="btn btn-outline-secondary" id="stopListeningBtn" disabled>
+                                        <i class="bi bi-mic-mute"></i> Stop Listening
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Call Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="callSettingsForm">
+                            <div class="mb-3">
+                                <label for="customerNameInput" class="form-label">Customer Name</label>
+                                <input type="text" class="form-control" id="customerNameInput" value="Yogesh Kumar">
+                            </div>
+                            <div class="mb-3">
+                                <label for="agentNameInput" class="form-label">Agent Name</label>
+                                <input type="text" class="form-control" id="agentNameInput" value="Rahul">
+                            </div>
+                            <div class="mb-3">
+                                <label for="languageSelect" class="form-label">Language</label>
+                                <select class="form-select" id="languageSelect">
+                                    <option value="en-IN">English (India)</option>
+                                    <option value="hi-IN">Hindi</option>
+                                </select>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="textModeCheck">
+                                <label class="form-check-label" for="textModeCheck">Text Mode (No Speech)</label>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="applySettingsBtn">Apply Settings</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Connect to WebSocket with explicit URL and error handling
+            const socket = io(window.location.origin, {
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+                timeout: 20000
+            });
+            
+            socket.on('connect_error', function(error) {
+                console.error('Socket connection error:', error);
+                alert('Connection error: Unable to connect to the server. Please refresh the page or try again later.');
+            });
+            
+            let callActive = false;
+            let callStartTime = null;
+            let callDurationInterval = null;
+            
+            // DOM elements
+            const chatContainer = document.getElementById('chatContainer');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const startCallBtn = document.getElementById('startCallBtn');
+            const endCallBtn = document.getElementById('endCallBtn');
+            const startListeningBtn = document.getElementById('startListeningBtn');
+            const stopListeningBtn = document.getElementById('stopListeningBtn');
+            const callStatus = document.getElementById('callStatus');
+            const callStatusText = document.getElementById('callStatusText');
+            const callDuration = document.getElementById('callDuration');
+            const callState = document.getElementById('callState');
+            const customerName = document.getElementById('customerName');
+            const agentName = document.getElementById('agentName');
+            
+            // Settings elements
+            const customerNameInput = document.getElementById('customerNameInput');
+            const agentNameInput = document.getElementById('agentNameInput');
+            const languageSelect = document.getElementById('languageSelect');
+            const textModeCheck = document.getElementById('textModeCheck');
+            const applySettingsBtn = document.getElementById('applySettingsBtn');
+            
+            // Apply initial settings
+            customerName.textContent = customerNameInput.value;
+            agentName.textContent = agentNameInput.value;
+            
+            // Socket event handlers
+            socket.on('connect', function() {
+                console.log('Connected to server');
+            });
+            
+            socket.on('agent_message', function(data) {
+                addMessage(data.message, 'agent');
+                
+                // Update call state if provided
+                if (data.state) {
+                    callState.textContent = data.state;
+                }
+                
+                // Text-to-speech if not in text mode
+                if (!textModeCheck.checked) {
+                    // The server will handle TTS
+                }
+            });
+            
+            socket.on('call_status', function(data) {
+                callActive = data.active;
+                updateCallStatus();
+                
+                if (data.active) {
+                    startCallBtn.disabled = true;
+                    endCallBtn.disabled = false;
+                } else {
+                    startCallBtn.disabled = false;
+                    endCallBtn.disabled = true;
+                    stopCallDurationTimer();
+                }
+            });
+            
+            // Button event handlers
+            startCallBtn.addEventListener('click', function() {
+                socket.emit('start_call', {
+                    customer_name: customerNameInput.value,
+                    agent_name: agentNameInput.value,
+                    language: languageSelect.value,
+                    text_mode: textModeCheck.checked
+                });
+                
+                startCallDurationTimer();
+            });
+            
+            endCallBtn.addEventListener('click', function() {
+                socket.emit('end_call', {});
+                stopCallDurationTimer();
+            });
+            
+            sendBtn.addEventListener('click', function() {
+                sendUserMessage();
+            });
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendUserMessage();
+                }
+            });
+            
+            // Speech recognition setup
+            let recognition = null;
+            try {
+                recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-IN'; // Default to English (India)
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    userInput.value = transcript;
+                    console.log('Speech recognized:', transcript);
+                    // Auto-send the recognized speech
+                    sendUserMessage();
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    startListeningBtn.disabled = false;
+                    stopListeningBtn.disabled = true;
+                };
+                
+                recognition.onend = function() {
+                    startListeningBtn.disabled = false;
+                    stopListeningBtn.disabled = true;
+                };
+            } catch (e) {
+                console.error('Speech recognition not supported:', e);
+                startListeningBtn.disabled = true;
+                alert('Speech recognition is not supported in your browser.');
+            }
+            
+            startListeningBtn.addEventListener('click', function() {
+                if (recognition) {
+                    try {
+                        // Update language based on current selection
+                        recognition.lang = languageSelect.value;
+                        recognition.start();
+                        startListeningBtn.disabled = true;
+                        stopListeningBtn.disabled = false;
+                    } catch (e) {
+                        console.error('Error starting speech recognition:', e);
+                    }
+                }
+            });
+            
+            stopListeningBtn.addEventListener('click', function() {
+                if (recognition) {
+                    try {
+                        recognition.stop();
+                        startListeningBtn.disabled = false;
+                        stopListeningBtn.disabled = true;
+                    } catch (e) {
+                        console.error('Error stopping speech recognition:', e);
+                    }
+                }
+            });
+            
+            applySettingsBtn.addEventListener('click', function() {
+                customerName.textContent = customerNameInput.value;
+                agentName.textContent = agentNameInput.value;
+            });
+            
+            // Helper functions
+            function addMessage(message, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = sender === 'user' ? 'user-message' : 'agent-message';
+                messageDiv.textContent = message;
+                chatContainer.appendChild(messageDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            
+            function sendUserMessage() {
+                const message = userInput.value.trim();
+                if (message && callActive) {
+                    socket.emit('user_message', { message: message });
+                    addMessage(message, 'user');
+                    userInput.value = '';
+                }
+            }
+            
+            function updateCallStatus() {
+                if (callActive) {
+                    callStatus.className = 'status-indicator status-active';
+                    callStatusText.textContent = 'Active';
+                } else {
+                    callStatus.className = 'status-indicator status-inactive';
+                    callStatusText.textContent = 'Inactive';
+                }
+            }
+            
+            function startCallDurationTimer() {
+                callStartTime = new Date();
+                callDurationInterval = setInterval(updateCallDuration, 1000);
+            }
+            
+            function stopCallDurationTimer() {
+                clearInterval(callDurationInterval);
+                callDuration.textContent = '00:00';
+            }
+            
+            function updateCallDuration() {
+                if (callStartTime) {
+                    const now = new Date();
+                    const diff = Math.floor((now - callStartTime) / 1000);
+                    const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+                    const seconds = (diff % 60).toString().padStart(2, '0');
+                    callDuration.textContent = `${minutes}:${seconds}`;
+                }
+            }
+            
+            // Initialize UI
+            updateCallStatus();
+        });
+    </script>
+</body>
+</html>

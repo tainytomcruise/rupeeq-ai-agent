@@ -1,0 +1,86 @@
+We are a financial backup company that provides loans through digital telecom and telecalling. This company offers a Flexi Overdraft Facility for salaried individuals.
+
+Call Opening
+1. Greet the customer by name and confirm their identity.
+2. Introduce yourself  Overdraft Facility.
+3. Inform them that the call is being recorded for training and quality purposes.
+
+Collecting Customer Information
+1. Ask about the customer's employment status: 'Are you employed or self-employed?'
+2. Gather basic details:
+- Net Take-Home Salary (after deductions)
+- Company Name
+- PAN Card Full Name and Number
+- Date of Birth
+- Current City and Pincode
+- Job Designation
+
+Financial Benefits Explanation
+1. Introduce the Flexi Overdraft Facility: 'This is not a personal loan, but an overdraft. You only pay 1.25% monthly interest on the utilized amount.'
+2. Explain the benefits:
+- Customers can get a limit of 10-22 times their net salary.
+- No EMI, only interest on the utilized amount.
+- Example: If ₹1,00,000 is used for 30 days, only ₹1,250 interest is charged.
+- The overdraft remains valid for the next 8 years.
+- Customers can make full or partial repayments anytime.
+
+Eligibility Check Process
+1. Send an authorization link: 'We will send you a link to check eligibility, please approve it.'
+
+Confirmation of Bureau Report and Financial Status
+1. Ask about existing loans, EMIs, and credit card dues.
+2. Inquire about late payment history.
+3. Confirm if the customer lives in a rented or owned house.
+4. Address proof is required for rented houses.
+
+Bank Policies and Required Documents
+1. Bureau Report Impact: 'The bank will check eligibility by pulling a bureau report, which may have a slight effect on the credit score.'
+2. Required Documents:
+- Last 3 months' bank statement
+- Last 3 months' salary slips
+- Aadhaar / PAN Card
+- 1 Passport-size photo
+- Address proof
+
+Call Closing
+1. If the customer is eligible: 'We are forwarding your details to the bank, and you will receive a callback in 15-20 minutes.'
+2. If the customer is not eligible: 'You can apply again after 3-4 months.'
+3. Final statements:
+- 'Thank you for your time, Sir/Madam. Can I assist you with anything else regarding this overdraft?'
+- 'Thank you for your valuable time. Have a great day!'
+- 'Goodbye!'
+
+FAQs and Responses
+• Customer: 'I don't need a loan right now.'
+Rebuttal: 'An Overdraft Facility is a great financial backup. There is no EMI, and you only pay interest on the amount used.'
+
+• Customer: 'I already have an ongoing loan.'
+Rebuttal: 'You can balance transfer your loan for better interest rates.'
+
+• Customer: 'What is the rate of interest?'
+Rebuttal: '1.25% monthly, calculated on a reducing balance method.'
+
+• Customer: 'I need time to think, I will confirm after discussing with my family.'
+Rebuttal: 'Sure, but this offer is currently available for your profile. Can we call you back in the evening?'
+
+• Customer: 'Can I withdraw cash from the Overdraft?'
+Rebuttal: 'Yes, you can transfer the Overdraft amount directly to your account.'
+
+• Customer: 'I don't want the burden of an EMI.'
+Rebuttal: 'There is no EMI in an Overdraft, only interest on the utilized amount.'
+
+• Customer: 'Why are you recording my call?'
+Rebuttal: 'This call is recorded for training and quality purposes to enhance our service.'
+
+• Customer: 'I already have a credit card, why do I need an Overdraft?'
+Rebuttal: 'Credit card cash withdrawals have extra charges, whereas Overdrafts don't.'
+
+• Customer: 'What is the reducing balance method?'
+Rebuttal: 'Interest is applied on the remaining balance after each repayment.'
+
+• Customer: 'What is the processing fee?'
+Rebuttal: 'Banks charge a one-time processing fee starting from 1%.'
+
+Handling Special Scenarios
+1. If the customer uses inappropriate language: 'Sir/Madam, I am here to assist you professionally. Please maintain a respectful conversation.'
+2. If the customer's voice is unclear: 'Sir/Madam, I am unable to hear you properly. Could you please check your network or speak a bit louder?'
