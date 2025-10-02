@@ -19,7 +19,8 @@ from typing import Dict, List, Optional, Any
 # Import our modules
 from ai_agent.speech_engine import SpeechEngine
 from ai_agent.conversation import ConversationManager
-from database.models import DatabaseManager, Call, Transcript, PerformanceMetrics
+# AFTER (the correct version)
+from database import init_db, Call, CallTranscript
 
 # Initialize Flask app
 app = Flask(__name__)
