@@ -1,67 +1,85 @@
+# In database/models.py
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Float, Enum, Text
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import datetime
+import enum
 import os
-import sqlite3
-import logging
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Use an environment variable for the database URL for Vercel compatibility
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///rupeeq_ai_agent.db")
 
-class DatabaseManager:
-    """Database manager for SQLite operations"""
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
-    def __init__(self, db_path: str = None):
-        # ✅ Handle Vercel deployment
-        if os.environ.get("VERCEL"):
-            # Ephemeral storage on Vercel
-            self.db_path = "/tmp/rupeeq_ai.db"
-            logger.info(f"Running on Vercel. Using temp DB at {self.db_path}")
-        else:
-            # Local persistent storage
-            self.db_path = db_path or "rupeeq_ai.db"
-            logger.info(f"Running locally. Using DB at {self.db_path}")
+class CallStatus(enum.Enum):
+    in_progress = "in_progress"
+    completed = "completed"
+    failed = "failed"
+    busy = "busy"
+    not_connected = "not_connected"
 
-        self.init_database()
+class CallOutcome(enum.Enum):
+    interested = "interested"
+    not_interested = "not_interested"
+    call_back = "call_back"
+    dnc = "dnc"
+    unknown = "unknown"
 
-    def init_database(self):
-        """Initialize database with required tables"""
+class Call(Base):
+    __tablename__ = 'calls'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    call_id = Column(String, unique=True, index=True, nullable=False)
+    customer_name = Column(String, nullable=False)
+    status = Column(Enum(CallStatus), default=CallStatus.in_progress)
+    outcome = Column(Enum(CallOutcome), default=CallOutcome.unknown)
+    start_time = Column(DateTime, default=datetime.datetime.now)
+    end_time = Column(DateTime, nullable=True)
+    duration = Column(Integer, nullable=True) # <-- SYNTAX ERROR FIXED
+    sentiment_score = Column(Float, nullable=True)
+    call_type = Column(String, default='ai_agent')
+    
+    def save(self):
+        db = SessionLocal()
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                # Example table — replace/add your own schema
-                cursor.execute("""
-                    CREATE TABLE IF NOT EXISTS users (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        name TEXT NOT NULL,
-                        email TEXT UNIQUE NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                    )
-                """)
-                conn.commit()
-            logger.info("✅ Database initialized successfully")
-        except Exception as e:
-            logger.error(f"Error initializing database: {e}")
-            raise
+            db.add(self)
+            db.commit()
+            db.refresh(self)
+        finally:
+            db.close()
 
-    def add_user(self, name: str, email: str):
-        """Insert a new user"""
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute(
-                    "INSERT INTO users (name, email) VALUES (?, ?)", 
-                    (name, email)
-                )
-                conn.commit()
-        except Exception as e:
-            logger.error(f"Error adding user: {e}")
-            raise
+    # NOTE: These are placeholder methods. You must add your own database query logic.
+    @staticmethod
+    def get_recent_calls(limit=50): return []
+    @staticmethod
+    def get_calls_today(): return {'total_calls': 0, 'status_counts': {}, 'avg_duration': 0, 'avg_sentiment': 0, 'outcome_counts': {}}
+    @staticmethod
+    def get_filtered_calls(filters): return []
+    @staticmethod
+    def get_call_by_id(call_id): return None
 
-    def get_users(self):
-        """Fetch all users"""
+class CallTranscript(Base):
+    __tablename__ = 'call_transcripts'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    call_id = Column(String, index=True, nullable=False)
+    speaker = Column(String, nullable=False)
+    message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, default=datetime.datetime.now)
+
+    def save(self):
+        db = SessionLocal()
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM users")
-                return cursor.fetchall()
-        except Exception as e:
-            logger.error(f"Error fetching users: {e}")
-            return []
+            db.add(self)
+            db.commit()
+            db.refresh(self)
+        finally:
+            db.close()
+
+    @staticmethod
+    def get_call_transcripts(call_id): return []
+
+def init_db():
+    Base.metadata.create_all(bind=engine)
