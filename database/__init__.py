@@ -1,17 +1,10 @@
-# Database package for RupeeQ AI Calling Agent
+# In database/__init__.py
 
-from .models import DatabaseManager, Call, Transcript, PerformanceMetrics
+# Make the correct models and init function available when 'database' is imported
+from .models import init_db, Call, CallTranscript
 
 __all__ = [
-    'DatabaseManager',
+    'init_db',
     'Call',
-    'Transcript', 
-    'PerformanceMetrics'
+    'CallTranscript'
 ]
-
-# Version info
-__version__ = '0.1.0'
-
-# Package metadata
-__author__ = 'RupeeQ Team'
-__description__ = 'Database models and operations for the AI calling agent'
